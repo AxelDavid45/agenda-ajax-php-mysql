@@ -7,7 +7,9 @@ EventListeners();
 function EventListeners() {
     //Inicia los eventlissteners
     FormNuevoContacto.addEventListener("submit", LeerForm);
+    if(ListadoContactos) {
     ListadoContactos.addEventListener('click', BotonesDeAccion);
+    }
 }
 
 function LeerForm(e) {
@@ -34,7 +36,12 @@ function LeerForm(e) {
             //Creamos el contacto en la bd
             InsertarEnDb(DatosFormulario);
         } else {
-
+            //Leemos el id que viene en el hidden
+            const idRegistro = document.querySelector("#id").value;
+            //Agregamos un elemento mas al JSON del DATAFORM
+            DatosFormulario.append('id',idRegistro);
+            //Actualizamos el registro
+            actualizarRegistro(DatosFormulario);
         }
     }
 }
@@ -103,6 +110,15 @@ function InsertarEnDb(formdata) {
     xhr.send(formdata);
 }
 
+function actualizarRegistro(formdata) {
+    //Peticion AJAX
+    //Creamos el objeto de la peticion
+    const xhr = new XMLHttpRequest();
+    //Abrimos la conexion
+    xhr.open('POST','inc/models/')
+    //Manejamos los datos
+    //Enviamos la peticion
+}
 
 function MostrarNotificacion(tipo, mensaje) {
     const notificacion = document.createElement('div');
