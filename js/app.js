@@ -9,12 +9,14 @@ function EventListeners() {
     //Inicia los eventlissteners
     FormNuevoContacto.addEventListener("submit", LeerForm);
     if(ListadoContactos) {
-    ListadoContactos.addEventListener('click', BotonesDeAccion);
+    ListadoContactos.addEventListener('click', BorrarRegistro);
     }
 
     if(inputBuscador) {
         inputBuscador.addEventListener('input',Buscador);
     }
+
+    contarRegistros();
 
 }
 
@@ -32,6 +34,22 @@ function Buscador(e) {
        }
 
     });
+    contarRegistros();
+}
+
+function contarRegistros() {
+    //Obtenemos todas las filas que existan en el tr
+    const registros = document.querySelectorAll("tbody tr"),
+          contenedorNumeroTotal = document.querySelector(".total-contactos span");
+    //Creamos un acumulador
+    let totalRegistros = 0;
+
+    registros.forEach(registro => {
+       if(registro.style.display === '' || registro.style.display === 'table-row' ) {
+           totalRegistros++;
+       }
+    });
+    contenedorNumeroTotal.innerText = totalRegistros;
 }
 
 function LeerForm(e) {
@@ -125,6 +143,9 @@ function InsertarEnDb(formdata) {
             MostrarNotificacion('correcto', 'Contacto agregado correctamente');
             //Resetear el form
             document.querySelector('form').reset();
+
+            //Contar registros
+            contarRegistros();
         }
     }
 
@@ -181,7 +202,8 @@ function MostrarNotificacion(tipo, mensaje) {
     }, 100);
 }
 
-function BotonesDeAccion(e) {
+
+function BorrarRegistro(e) {
     //Revisamos si contiene la clase unica de los botones de borrar
     if (e.target.parentElement.classList.contains('btn-borrar')) {
         const id = e.target.parentElement.getAttribute('data-id');
@@ -206,6 +228,7 @@ function BotonesDeAccion(e) {
                         //Notificacion de error
                         MostrarNotificacion('error', 'Ocurrio un error interno...');
                     }
+                    contarRegistros();
 
                 }
             }
