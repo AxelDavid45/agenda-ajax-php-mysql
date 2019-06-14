@@ -1,5 +1,6 @@
 const FormNuevoContacto = document.querySelector('#contacto'),
-    ListadoContactos = document.querySelector('#listado-contactos tbody');
+    ListadoContactos = document.querySelector('#listado-contactos tbody'),
+    inputBuscador = document.querySelector("#buscar");
 
 //Inicia los eventListeners
 EventListeners();
@@ -10,6 +11,27 @@ function EventListeners() {
     if(ListadoContactos) {
     ListadoContactos.addEventListener('click', BotonesDeAccion);
     }
+
+    if(inputBuscador) {
+        inputBuscador.addEventListener('input',Buscador);
+    }
+
+}
+
+function Buscador(e) {
+    //Empezamos a crear una expresion regular
+    const expresion = new RegExp(e.target.value,'i');
+    //Obtenemos todos los elementos que existan en la tabla
+    const elementosTable = document.querySelectorAll("tbody tr");
+
+    elementosTable.forEach(elemento => {
+       elemento.style.display = 'none';
+
+       if(elemento.childNodes[1].textContent.replace("/\s\g"," ").search(expresion) != -1) {
+           elemento.style.display = 'table-row';
+       }
+
+    });
 }
 
 function LeerForm(e) {
@@ -115,9 +137,28 @@ function actualizarRegistro(formdata) {
     //Creamos el objeto de la peticion
     const xhr = new XMLHttpRequest();
     //Abrimos la conexion
-    xhr.open('POST','inc/models/')
+    xhr.open('POST','inc/models/ContactosModel.php',true);
     //Manejamos los datos
+    xhr.onload = function () {
+        if(this.status === 200) {
+            const response = JSON.parse(this.responseText);
+            //Mostramos las notificaciones
+            if(response.respuesta === 'correcto') {
+                //Alerta correcto
+                MostrarNotificacion('correcto','Contacto Modificado correctamente');
+            } else {
+                //Alerta de error
+                MostrarNotificacion('error','Ocurrio un error...');
+            }
+
+            //Redireccion a la pagina principal
+            setTimeout(() => {
+                window.location.href = 'index.php';
+            },1500);
+        }
+    }
     //Enviamos la peticion
+    xhr.send(formdata);
 }
 
 function MostrarNotificacion(tipo, mensaje) {

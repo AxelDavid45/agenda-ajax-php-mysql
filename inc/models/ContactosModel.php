@@ -39,6 +39,40 @@ if(isset($_POST['accion']) && $_POST['accion'] == 'crear') {
     echo json_encode($respuesta);
 }
 
+if(isset($_POST['accion']) && $_POST['accion'] == 'editar') {
+    //Importamos la conexion
+    require_once "../functions/database.php";
+
+    //Limpiamos las variables
+    $nombre = filter_var($_POST['nombre'], FILTER_SANITIZE_STRING);
+    $empresa = filter_var($_POST['empresa'], FILTER_SANITIZE_STRING);
+    $telefono = filter_var($_POST['telefono'], FILTER_SANITIZE_STRING);
+    $id = filter_var($_POST['id'],FILTER_VALIDATE_INT);
+
+    if(empty($nombre) ||empty($empresa) || empty($telefono)) {
+        //Enviamos error
+        $respuesta = array("respuesta" => 'error');
+    } else {
+        //Hacemos el statement para mas seguridad
+        $query_stmt = "UPDATE contactos SET nombre = ?, empresa = ?, telefono = ? WHERE id = ?";
+        $stmt = $conexion->prepare($query_stmt);
+        $stmt->bind_param('sssi',$nombre,$empresa,$telefono,$id);
+        $stmt->execute();
+
+        if($stmt->affected_rows == 1) {
+            //Si se afecta una fila enviamos el array como respuesta con los datos
+            $respuesta = array(
+                "respuesta" => 'correcto'
+            );
+        }
+        //Cerramos conexiones
+        $stmt->close();
+        $conexion->close();
+
+    }
+    echo json_encode($respuesta);
+}
+
 
 if(isset($_GET['accion']) && $_GET['accion'] == 'borrar') {
     //Sanitiza las variables
